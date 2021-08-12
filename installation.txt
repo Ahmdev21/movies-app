@@ -1,0 +1,337 @@
+
+Aller directement à la fin des métadonnées
+Créée par Guillaume JOUSSE, dernière modification par Christ GAGNON le 29 juin, 2021Aller au début des métadonnées
+créé par Cyril MATTE
+
+ 
+
+I. Installation de WSL
+
+Réf : https://docs.microsoft.com/en-us/windows/wsl/install-win10#manual-installation-steps
+
+a. activer le sous-système Windows pour Linux
+
+Ouvrir PowerShell comme Administrateur : 
+      Deux fonctionnalités optionnelles à installer : Microsoft-Windows-Subsystem-Linux ,VirtualMachinePlatform 
+
+dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+
+dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+
+
+
+Remarque : Si les deux commandes ci dessus ne permettent pas l'installation du noyau Linux, alors essayer simplement dans PowerShell
+
+ Ouvrir PowerShell comme Administrateur, et exécuter la commande puis  après redémarrer             
+                    EnableWindowsOptionnalFeature  -Online - FeatureName Microsoft-Windows-Subsystem-Linux 
+
+ Ouvrir de nouveau PowerShell comme Administrateur, exécuter la commande et redémarrer
+                 EnableWindowsOptionnalFeature    -Online   -FeatureName   VirtualMachinePlatform 
+
+
+
+b. télécharger le package de mise à jour du noyau Linux
+
+Télécharger et installer le package Linux sur : https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi
+c. définir WSL 2 comme version par défaut
+
+Ouvrir PowerShell comme Administrateur :
+wsl --set-default-version 2
+
+
+d. Installer la version Linux de son choix sur le Microsoft Store, par exemple Ubuntu 20.04 LTS
+
+Comme exemple : Ubuntu 20.04 LTS
+
+https://www.microsoft.com/fr-fr/p/ubuntu-2004-lts/9n6svws3rx71?rtc=1&activetab=pivot:overviewtab
+
+
+
+e. Vérifiez la bonne version d’installation
+
+wsl --list –verbose NAME   STATE   VERSIONUbuntu Stopped 2
+
+
+II. Activer la virtualisation
+
+Assurer que la virtualisation est bien activé sur votre machine.
+Pour vérifier : Ouvrez le Gestionnaire des tâches en appuyant simultanément sur la touche Ctrl+Maj+Echap et accédez à l'onglet "Performances". En bas à droite, vous verrez "Virtualisation". Vous verrez "Activé" ou "Désactivé" à côté de cela.
+Pour activer cette option, veuillez redémarre votre machine en accédant aux paramètres de votre BIOS. Chercher et activer l’option "Virtualisation" au niveau des paramètres de système ou paramètres avancés (suivant votre machine).
+Plus de détails sur cet article!
+
+
+NB : Vous trouvez votre environnement Linux sous le répertoire : \\wsl$\Ubuntu\home\your_username
+
+
+
+III. Installation et configuration de Docker
+
+Références
+
+Windows : https://docs.docker.com/docker-for-windows/install/
+
+Windows Home : https://docs.docker.com/docker-for-windows/install-windows-home/
+
+a. Installation
+
+Télécharger le binaire Docker Desktop : https://desktop.docker.com/win/stable/Docker%20Desktop%20Installer.exe
+
+Sur la partie "Paramètres" du Docker Desktop et l'option "Ressources"
+
+Sélectionner « Enable WSL 2 Features »
+Définir le network : Docker subnet = 192.168.65.0/28
+Configurer le proxy
+Web Server (HTTP) : http://USERNAME:PASSWORD@10.176.205.3:8080/
+
+Secure Web Server (HTTPS) : http://USERNAME:PASSWORD@10.176.205.3:8080/
+
+Bypass : 127.0.0.1,[::1],localhost,*.local,.local,carrefour.local,192.168.10.100,*.local,100.69.3.138,10.69.2.199,cipcssmc.carrefour.com
+
+b. configuration
+
+## TODO : à completer
+
+éditer les fichiers "docker-compose.yml" et "dockerfile"
+
+
+
+IV. Configuration du VPN
+
+Ouvrir la configuration Réseau (Menu Windows > Paramètres > Réseau et internet > VPN)
+« Ajouter une connexion VPN »
+Nom de la connexion : VPN Carrefour
+
+Nom ou adresse du serveur : ras.carrefour.com
+
+Type de réseau privé virtuel : Protocole SSTP
+
+Type d’information : Nom d’utilisateur et mot de passe
+
+Nom d’utilisateur : <nom d’utilisateur>
+
+Mot de passe : <mot de passe> 
+
+
+
+∆ Si la connexion ne s’effectue pas: Dans le gestionnaire de périphériques (Clique-droit sur Menu Windows), supprimer toutes les cartes réseaux WAN Miniport. Puis cliquer sur « Action > Actualiser ».
+
+∆ Il peut être nécessaire de configurer la gestion IPv4:
+
+    - Panneau de configuration > Réseau et Internet > Centre Réseau et partage => Cartes Connexion Réseau (Modifier les paramètres de la carte)
+
+    - Click-droit sur "VPN Carrefour" (Propriété) > [ Gestion de réseau ] > [v] Protocole Internet version 4 (TCP/IPv4) > Propriété > Avancé
+
+    - Dans l'onglet [Paramètres IP] => Déselectionner "Utiliser la passerelle par défault pour le réseau distant"
+
+
+
+V. Utilisation du Proxy
+
+Utiliser l’extension de navigateur SwitchyOmega, et configurer les profiles
+ 
+
+Profile1
+
+HTTP 10.176.205.3:8080
+
+Bypass :
+
+127.0.0.1
+
+[::1]
+
+Localhost
+
+*.local,.local
+
+
+
+Profile2
+
+HTTP 10.49.64.5 :8080
+
+Bypass :
+
+127.0.0.1
+
+[::1]
+
+Localhost
+
+*.local,.local
+
+carrefour.local
+
+192.168.10.100
+
+*.local
+
+100.69.3.138
+
+10.69.2.199
+
+cipcssmc.carrefour.com
+
+ 
+
+Autoswitch
+
+*.carrefour.local +10.176.205.3
+
+doc.agilefabric.fr.carrefour.com +Carrefour
+
+*.agilefabric.fr.carrefour.com +direct
+
+*.fr.carrefour.com +Carrefour
+
+*.vpod1.carrefour.com +Carrefour
+
+www-prep.carrefour.fr +Carrefour
+
+*.one.carrefour.com +Carrefour
+
+medias-preprod2-carrefour.e-catalogues.pro +Carrefour
+
+* +direct
+
+
+
+VI. Configuration du projet
+
+a. Configurer le proxy pour npm 
+
+Lancer le terminal est exécuter les commandes suivants
+
+npm config set proxy='http://USERNAME:PASSWORD@10.176.205.3:8080'
+npm config set https-proxy='http://USERNAME:PASSWORD@10.176.205.3:8080'
+
+NB: Vous pouvez déclarer cette configuration au niveau du fichier .npmrc
+
+
+
+b. configurer l'environnement Linux
+
+Assurer que vous avez bien le droit sur les répertoires suivants:
+
+$> sudo chown USERNAME:USERNAME -R local/
+$> sudo chown USERNAME:USERNAME -R uilibrary /
+$> sudo chown USERNAME:USERNAME -R frontone/
+
+Chercher et éditer le fichier « resolv.conf » en rajoutant les nameserver en plus bas:
+
+nameserver 8.8.8.8
+
+nameserver 10.176.205.3
+
+editer le fichier .bashrc  (\\wsl$\Ubuntu\home\your_username\.bashrc)
+
+echo "mahmoud" | sudo -s sed -ie "s/nameserver 172.*/nameserver 8.8.8.8/" /etc/resolv.conf
+echo "mahmoud" | sudo -s echo "nameserver 10.176.205.3" >> /etc/resolv.conf
+export http_proxy='http://USERNAME:PASSWORD@10.176.205.3:8080'
+export https_proxy='http://USERNAME:PASSWORD@10.176.205.3:8080'
+
+         Remarque : Exemple de config Docker qui marche pour récupérer les images du repo Bitbucket cloné.
+
+
+Docker proxy :         
+                                       HTTP  =10.49.64.5:8080
+
+                                       HTTPS =10.49.64.5:8080
+
+                                      Bypass proxy =127.0.0.1,[::1],localhost,*.local,.local,carrefour.local,192.168.10.100,*.local,100.69.3.138,10.69.2.199,cipcssmc.carrefour.com
+
+Faire de même pour la configuration manuelle du serveur proxy :
+                                   Adresse :  10.49.64.5 
+
+                                   Port : 8080
+
+                                   Utiliser le serveur sauf pour les adresses qui commences par les entrées suivantes séparées de ;:
+
+                                         127.0.0.1;1;localhost;carrefour.local;localhost;192.168.10.100;*.local;100.69.3.138;10.69.2.199;cipcssmc.carrefour.com 
+
+                                   
+
+                 
+
+c. Récupérer les repositories
+
+git clone https://bitbucket.agilefabric.fr.carrefour.com/scm/dig/onecarrefour_frontone_ishop.git
+
+git clone https://bitbucket.agilefabric.fr.carrefour.com/scm/dig/onecarrefour_uilibrary_ishop.git
+
+git clone https://bitbucket.agilefabric.fr.carrefour.com/scm/dig/onecarrefour_frontlayer_local.git
+
+Renommer les 3 répertoires en "frontone", "uilibrary" et "local".
+Suivre les directives du README dans le répertoire « local »
+
+
+Pour la 1er utilisation de GIT, veuillez personnaliser votre environnement en mettant à jour les paramètres d'authentification pour les différents répertoires.
+
+Lancer le terminal et exécuter 
+
+git remote set-url origin 'https://USERNAME:PASSWORD@bitbucket.agilefabric.fr.carrefour.com/scm/dig/onecarrefour_uilibrary_imanage.git'
+
+
+
+d. Configurer du host local
+
+Rajouter la ligne en plus bas au niveau du fichier host (C:\Windows\System32\drivers\etc)
+
+127.0.0.1  carrefour.local
+
+
+
+e. Lancer le projet
+
+Lancer un terminal WSL sur le dossier "local" et exécuter l'environnement Docker  à l'aide de la commande :
+
+Activer le proxy configuré (manuellement) avant l'exécution de la commande.
+
+docker-compose up --build
+
+1 - Pour l'environnement FRONT. Lancer un terminal WSL sur le dossier "uilibrary" et exécuter les commandes suivants:
+
+Lancer l'env docker / installation des dépendances / lancer le projet
+docker exec -it front_node bash
+
+npm install
+
+npm run build
+
+npm run dev:symfony
+
+2 -  Pour l'environnement PHP. Lancer un terminal WSL sur le dossier "frontone" et exécuter les commandes suivants:
+
+docker exec -it front_php bash
+
+## TODO
+
+
+
+
+
+IX. Installation de NPM
+
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+
+export NVM_DIR="~/.nvm"
+
+[  -s "$NVM_DIR/nvm.sh"  ] && \. "$NVM_DIR/nvm.sh"
+
+[  -s "$NVM_DIR/bash_completion"  ] && \. "$NVM_DIR/bash_completion"
+
+.Faire attention à l'espace  au début et à la fin des crochets.
+
+nvm install 14 && nvm use 14
+
+Mise à jour de la version de Node importante avant de faire npm rum build:dev:watch
+Avec les commandes ci -dessous, faire nvm install 14, nvm use 14 et ensuite vérifier la version de Node (node -v)
+Troubleshooting
+Mon WSL prend fréquemment une portion non négligeable des ressources de ma machine. Que faire ?
+
+=> Le limiter en créant un fichier C:\Users\<yourUserName>\.wslconfig  avec le contenu :
+
+[wsl2]
+memory=8GB
+swap=0
+voit aussi https://docs.microsoft.com/en-us/windows/wsl/wsl-config
